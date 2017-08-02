@@ -1,6 +1,3 @@
-[submodule "hey"]
-	path = hey
-	url = git@github.com:cf-routing/hey.git
 [submodule "src/github.com/rakyll/hey"]
 	path = src/github.com/rakyll/hey
 	url = git@github.com:cf-routing/hey.git
