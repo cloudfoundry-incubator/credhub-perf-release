@@ -99,7 +99,7 @@ fig, ax = plt.subplots()
 
 # Change the value of `c` to change the color. http://matplotlib.org/api/colors_api.html
 ax = goData.plot(ax=ax, kind='scatter', x='throughput', y='latency', c='b', marker='.', alpha=0.2)
-ax.plot(domain, goFitLine, c='r', lw=3)  # Plot the fit line
+ax.plot(domain, goFitLine, c='b', lw=2)  # Plot the fit line
 
 if compareDatasets:
     ax = oldGoData.plot(ax=ax, kind='scatter', x='throughput', y='latency', c='r', marker='.', alpha=0.2)
@@ -107,8 +107,8 @@ if compareDatasets:
     ax.legend(['after', 'before'])
 
 # To update x & y axis range change the parameters in function set_(x/y)lim(lower_limit, uppper_limit)
-ax.set_ylim(0, 4)
-ax.set_xlim(0, 100)
+ax.set_ylim(0, 2)
+ax.set_xlim(0, 75)
 plt.xlabel('Throughput (requests/sec)')
 plt.ylabel('Latency (sec)')
 plt.title('Headroom plot', y=1.05)
