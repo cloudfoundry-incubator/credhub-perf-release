@@ -174,4 +174,8 @@ gradle-app.setting
 # Ignore any key stores
 *.jks
 
-src/main/resources/version
+# Python
+.Python
+**/**/include/
+**/**/lib/
+**/**/bin/
