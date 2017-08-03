@@ -1,28 +1,31 @@
 package main
 
 import (
-	"os"
-	"strconv"
+	"flag"
 )
 
 func main() {
-	numRequests, _ := strconv.Atoi(os.Args[1])
-	requestType := os.Args[2]
-	url := os.Args[3]
+	numRequests := flag.Int("numRequests", 10000, "number of requests per concurrency step")
+	requestType := flag.String("requestType", "get", "type of request: get, set, or interpolate")
+	url := flag.String("url", "https://localhost:8844", "credhub url")
+	minConcurrent := flag.Int("minConcurrent", 1, "minimum number of concurrent requests")
+	maxConcurrent := flag.Int("maxConcurrent", 50, "maximum number of concurrent requests")
+	step := flag.Int("step", 1, "interval for concurrent requests")
 
 	//requestType = set or get or interpolate
 	//url = https://34.231.67.18:8844
+	flag.Parse()
 
-	rampedRequest := &RampedRequest{1, 15, 1, numRequests, ""}
+	rampedRequest := &RampedRequest{*minConcurrent, *maxConcurrent, *step, *numRequests, ""}
 
 	const credentialName = "perf-test-json"
-	switch requestType {
+	switch *requestType {
 	case "set":
-		launchSetRequests(rampedRequest, url, credentialName)
+		launchSetRequests(rampedRequest, *url, credentialName)
 	case "get":
-		launchGetRequests(rampedRequest, url, credentialName)
+		launchGetRequests(rampedRequest, *url, credentialName)
 	case "interpolate":
-		launchInterpolateRequests(rampedRequest, url, credentialName)
+		launchInterpolateRequests(rampedRequest, *url, credentialName)
 	}
 }
 
