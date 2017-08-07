@@ -184,3 +184,6 @@ gradle-app.setting
 pip-selfcheck.json
 src/credhub_cannon/hey
 src/credhub_cannon/credhub_cannon
+
+# Ignore credhub_cannot results
+*.csv
