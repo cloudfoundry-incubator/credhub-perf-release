@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"os"
 )
 
 func main() {
@@ -11,12 +12,25 @@ func main() {
 	minConcurrent := flag.Int("minConcurrent", 1, "minimum number of concurrent requests")
 	maxConcurrent := flag.Int("maxConcurrent", 50, "maximum number of concurrent requests")
 	step := flag.Int("step", 1, "interval for concurrent requests")
+	x509UserCert := flag.String("x509Cert", "", "path to mtls x509 certificate")
+	x509UserKey := flag.String("x509Key", "", "path to mtls x509 key")
 
 	//requestType = set or get or interpolate
 	//url = https://34.231.67.18:8844
 	flag.Parse()
 
-	rampedRequest := &RampedRequest{*minConcurrent, *maxConcurrent, *step, *numRequests, ""}
+	x509Cert := *x509UserCert
+	x509Key := *x509UserKey
+
+	if x509Cert == "" {
+		os.Stderr.WriteString("Please enter x509Cert")
+		os.Exit(1)
+	} else if x509Key == "" {
+		os.Stderr.WriteString("Please enter x509Key")
+		os.Exit(1)
+	}
+
+	rampedRequest := &RampedRequest{*minConcurrent, *maxConcurrent, *step, *numRequests, "", x509Cert, x509Key}
 
 	const credentialName = "perf-test-json"
 	switch *requestType {
