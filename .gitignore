@@ -187,3 +187,9 @@ src/credhub_cannon/credhub_cannon
 
 # Ignore credhub_cannot results
 *.csv
+
+# BOSH
+config/private.yml
+blobs/
+.dev_builds/
+dev_releases/
