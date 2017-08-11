@@ -1,0 +1,41 @@
+---
+name: credhub_cannon
+
+templates:
+  run.erb: bin/run
+  mtls_auth_certificate.pem.erb: config/mtls_auth_certificate.pem
+  mtls_auth_private_key.pem.erb: config/mtls_auth_private_key.pem
+
+packages:
+- golang_1.8.3
+#- credhub_cannon
+#- hey
+
+properties:
+  credhub.server.url:
+    description: Endpoint of the CredHub server
+    example: https://credhub.example.com:8844
+  cannon.credhub_auth.mtls:
+    description: X509 certificate and private key for CredHub authentication
+    type: certificate
+    example: |
+      certificate: |
+        -----BEGIN CERTIFICATE-----
+        ...
+        -----END CERTIFICATE-----
+      private_key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        ...
+        -----END RSA PRIVATE KEY-----
+  cannon.num_requests:
+    description: Number of requests per concurrency step
+    default: 10000
+  cannon.min_concurrent:
+    description: Minimum number of concurrent requests
+    default: 1
+  cannon.max_concurrent:
+    description: Maximum number of concurrent requests
+    default: 50
+  cannon.step:
+    description: Interval for concurrent requests
+    default: 1

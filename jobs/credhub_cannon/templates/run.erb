@@ -1,0 +1,25 @@
+#!/bin/bash
+
+LOG_DIR=/var/vcap/sys/log/credhub_cannon
+NUM_REQUESTS="<%= p('cannon.num_requests') %>"
+MIN_CONCURRENT="<%= p('cannon.min_concurrent') %>"
+MAX_CONCURRENT="<%= p('cannon.max_concurrent') %>"
+STEP="<%= p('cannon.step') %>"
+CREDHUB_URL="<%= p('credhub.server.url') %>"
+CERTIFICATE_PATH=/var/vcap/jobs/credhub_cannon/config/mtls_auth_certificate.pem
+KEY_PATH=/var/vcap/jobs/credhub_cannon/config/mtls_auth_private_key.pem
+
+export PATH="/var/vcap/packages/hey/bin:${PATH}"
+
+mkdir -p "${LOG_DIR}"
+
+/var/vcap/packages/credhub_cannon/bin/credhub_cannon \
+    --numRequests $NUM_REQUESTS \
+    --minConcurrent $MIN_CONCURRENT \
+    --maxConcurrent $MAX_CONCURRENT \
+    --step $STEP \
+    --url $CREDHUB_URL \
+    --x509Cert "${CERTIFICATE_PATH}" \
+    --x509Key "${KEY_PATH}" \
+    >> "${LOG_DIR}/credhub_cannon.log" \
+    2>> "${LOG_DIR}/credhub_cannon.stderr.log"

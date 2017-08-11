@@ -1,0 +1,4 @@
+---
+name: golang_1.8.3
+files:
+- golang_1.8.3/go1.8.3.linux-amd64.tar.gz # From: https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz
