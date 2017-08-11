@@ -1,3 +1,4 @@
 [submodule "src/github.com/rakyll/hey"]
 	path = src/github.com/rakyll/hey
-	url = git@github.com:cf-routing/hey.git
+	url = git@github.com:iredelmeier/hey.git
+	branch = x509
