@@ -40,7 +40,7 @@ def readThroughputData(filename):
     df = pd.DataFrame()
     # Read each section delimited by the csv headers
     for cur in header_idxs[1:]:
-        dfSection = pd.read_csv(StringIO(data[prev:cur]), parse_dates=['start-time'])
+        dfSection = pd.read_csv(StringIO(unicode(data[prev:cur])), parse_dates=['start-time'])
         df = df.append(trimEdges(dfSection))
         prev = cur
     # Reset the index because it is a Frankenstein of smaller indexes
