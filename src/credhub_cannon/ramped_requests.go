@@ -93,7 +93,7 @@ func run(url, httpVerb, requestBody string, numRequests, concurrentRequests, rat
 		url,
 	}
 
-	heyCmd := exec.Command("./hey", args...)
+	heyCmd := exec.Command("hey", args...)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	heyCmd.Stdout = &out
