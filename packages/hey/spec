@@ -1,0 +1,9 @@
+---
+name: hey
+dependencies:
+- golang_1.8.3
+files:
+- github.com/rakyll/hey/**/*
+- golang.org/x/net/**/*
+- golang.org/x/text/**/*
+- github.com/vkuznet/x509proxy/*.go

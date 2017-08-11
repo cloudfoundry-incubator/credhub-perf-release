@@ -8,8 +8,8 @@ templates:
 
 packages:
 - golang_1.8.3
+- hey
 #- credhub_cannon
-#- hey
 
 properties:
   credhub.server.url:

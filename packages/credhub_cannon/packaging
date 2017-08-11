@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eux
+
+PATH=$PATH:${BOSH_INSTALL_TARGET}/bin
+
+pushd "${BOSH_COMPILE_TARGET}/credhub_cannon"
+  GOOS=linux ./var/vcap/packages/golang_1.8.3/bin/go build .
+popd
+
+echo "BOSH INSTALL TARGET: ${BOSH_INSTALL_TARGET}"
+
+mkdir -p "${BOSH_INSTALL_TARGET}/bin"
+cp "${BOSH_COMPILE_TARGET}/credhub_cannon/credhub_cannon" "${BOSH_INSTALL_TARGET}/bin"

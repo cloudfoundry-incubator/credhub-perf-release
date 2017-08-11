@@ -1,0 +1,7 @@
+---
+name: credhub_cannon
+dependencies:
+- golang_1.8.3
+- hey
+files:
+- credhub_cannon/**/*.go
