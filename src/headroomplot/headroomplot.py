@@ -41,7 +41,13 @@ def readThroughputData(filename):
     # Read each section delimited by the csv headers
     for cur in header_idxs[1:]:
         dfSection = pd.read_csv(StringIO(unicode(data[prev:cur])), parse_dates=['start-time'])
-        df = df.append(trimEdges(dfSection))
+        trimmedSection = trimEdges(dfSection)
+
+        if len(trimmedSection) == 0:
+            print "There is not enough data to build headroom plot. Please increase the number of requests."
+            exit(1)
+
+        df = df.append(trimmedSection)
         prev = cur
     # Reset the index because it is a Frankenstein of smaller indexes
     df = df.reset_index().drop('index', axis=1)
