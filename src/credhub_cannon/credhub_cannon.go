@@ -45,7 +45,7 @@ func main() {
 }
 
 func launchSetRequests(rampedRequest *RampedRequest, url string, name string) {
-	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/setPerfResults" + time.Now().UTC().Format("20060102150405") + ".csv"
+	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/setPerfResults-" + time.Now().UTC().Format("20060102150405") + ".csv"
 	requestBody := `{
   "name": "/c/p-spring-cloud-services/circuit-breaker/5c9073f9-677b-4eb7-8c95-4b89d66d2890/credential-json",
   "type": "json",
@@ -139,12 +139,12 @@ func launchSetRequests(rampedRequest *RampedRequest, url string, name string) {
 }
 
 func launchGetRequests(rampedRequest *RampedRequest, url string, name string) {
-	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/getPerfResults" + time.Now().UTC().Format("20060102150405") + ".csv"
+	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/getPerfResults-" + time.Now().UTC().Format("20060102150405") + ".csv"
 	rampedRequest.FireRequests(url+"/api/v1/data?name=/c/p-spring-cloud-services/circuit-breaker/5c9073f9-677b-4eb7-8c95-4b89d66d2890/credential-json", "GET", "")
 }
 
 func launchInterpolateRequests(rampedRequest *RampedRequest, url string, name string) {
-	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/interpolatePerfResults" + time.Now().UTC().Format("20060102150405") + ".csv"
+	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/interpolatePerfResults-" + time.Now().UTC().Format("20060102150405") + ".csv"
 
 	requestBody := `{
   "p-circuit-breaker-dashboard": [
