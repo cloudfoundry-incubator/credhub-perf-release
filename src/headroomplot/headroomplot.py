@@ -71,6 +71,7 @@ def processThroughputData(data):
 
 
 goData = readThroughputData(performanceResultsFile)
+
 throughputBuckets, throughputData = processThroughputData(goData)
 
 if compareDatasets:
@@ -88,18 +89,19 @@ if compareDatasets:
 def generateFitLine(data):
     y, x = dmatrices('latency ~ throughput', data=data, return_type='dataframe')
     fit = sm.GLM(y, x, family=sm.families.InverseGaussian(sm.families.links.inverse_squared)).fit()
-
-    domain = np.arange(data['throughput'].min(), data['throughput'].max())
+    maxThroughput = data['throughput'].max()
+    minThroughtput = data['throughput'].min()
+    domain = np.arange(minThroughtput, maxThroughput)
     predictionInputs = np.ones((len(domain), 2))
     predictionInputs[:, 1] = domain
     fitLine = fit.predict(predictionInputs)
-    return domain, fitLine
+    return domain, fitLine, round(maxThroughput)
 
 
-domain, goFitLine = generateFitLine(goData)
+domain, goFitLine, xLimit = generateFitLine(goData)
 
 if compareDatasets:
-    oldDomain, oldGoFitLine = generateFitLine(oldGoData)
+    oldDomain, oldGoFitLine oldXLimit = generateFitLine(oldGoData)
 
 fig, ax = plt.subplots()
 
@@ -113,10 +115,15 @@ if compareDatasets:
     ax.legend(['after', 'before'])
 
 # To update x & y axis range change the parameters in function set_(x/y)lim(lower_limit, uppper_limit)
+
 ax.set_ylim(0, 2)
-ax.set_xlim(0, 75)
+ax.set_xlim(0, xLimit)
+ax.autoscale_view(True, True, True)
 plt.xlabel('Throughput (requests/sec)')
 plt.ylabel('Latency (sec)')
 plt.title('Headroom plot', y=1.05)
 plt.plot()
-plt.savefig(performanceResultsFile[:-4] + "Plot.png")
+
+filenameForPlot = performanceResultsFile[:-4] + "Plot.png"
+plt.savefig(filenameForPlot)
+print ("saving graph to " + filenameForPlot)
