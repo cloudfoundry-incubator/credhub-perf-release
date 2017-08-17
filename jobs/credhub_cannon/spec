@@ -40,5 +40,5 @@ properties:
     description: Interval for concurrent requests
     default: 1
   cannon.request_type:
-    description: Type of request: get, set, or interpolate
+    description: Type of request (get, set, or interpolate)
     default: get
