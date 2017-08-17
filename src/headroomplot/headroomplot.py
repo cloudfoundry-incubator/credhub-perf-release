@@ -101,7 +101,7 @@ def generateFitLine(data):
 domain, goFitLine, xLimit = generateFitLine(goData)
 
 if compareDatasets:
-    oldDomain, oldGoFitLine oldXLimit = generateFitLine(oldGoData)
+    oldDomain, oldGoFitLine, oldXLimit = generateFitLine(oldGoData)
 
 fig, ax = plt.subplots()
 

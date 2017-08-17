@@ -20,7 +20,7 @@ type RampedRequest struct {
 
 func (rr *RampedRequest) FireRequests(url, httpVerb, requestBody string) {
 	if rr.MinConcurrent >= rr.MaxConcurrent {
-		panic("MinConcurrent must be greater than MaxConcurrent")
+		panic("MinConcurrent must be less than MaxConcurrent")
 	}
 
 	if rr.NumberOfRequests < rr.MaxConcurrent {
@@ -106,5 +106,8 @@ func run(url, httpVerb, requestBody string, numRequests, concurrentRequests, rat
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 	}
+	fmt.Println( "returned from hey")
+	fmt.Println(out.String())
+	fmt.Println("done")
 	return []byte(out.String()), nil
 }
