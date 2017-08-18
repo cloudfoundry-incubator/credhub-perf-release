@@ -14,12 +14,12 @@ type RampedRequest struct {
 	Step             int
 	NumberOfRequests int
 	LocalCSV         string
-	X509Cert string
-	X509Key string
+	X509Cert         string
+	X509Key          string
 }
 
 func (rr *RampedRequest) FireRequests(url, httpVerb, requestBody string) {
-	if rr.MinConcurrent >= rr.MaxConcurrent {
+	if rr.MinConcurrent >= rr.MaxConcurrent && rr.Step > 0 {
 		panic("MinConcurrent must be less than MaxConcurrent")
 	}
 
@@ -106,7 +106,7 @@ func run(url, httpVerb, requestBody string, numRequests, concurrentRequests, rat
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 	}
-	fmt.Println( "returned from hey")
+	fmt.Println("returned from hey")
 	fmt.Println(out.String())
 	fmt.Println("done")
 	return []byte(out.String()), nil
