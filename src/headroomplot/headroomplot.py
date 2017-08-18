@@ -116,8 +116,7 @@ if compareDatasets:
 
 # To update x & y axis range change the parameters in function set_(x/y)lim(lower_limit, uppper_limit)
 
-ax.set_ylim(0, 10)
-ax.set_xlim(0, xLimit)
+ax.autoscale(True)
 ax.autoscale_view(True, True, True)
 plt.xlabel('Throughput (requests/sec)')
 plt.ylabel('Latency (sec)')
