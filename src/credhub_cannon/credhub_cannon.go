@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 	"time"
+	"fmt"
 )
 
 func main() {
@@ -30,6 +31,10 @@ func main() {
 		os.Stderr.WriteString("Please enter x509Key")
 		os.Exit(1)
 	}
+
+	fmt.Println("beginning [" + *requestType + "] tests on instance: " + *url)
+	fmt.Println("concurrency from %v to %v, step by %v",  minConcurrent, maxConcurrent, step)
+	fmt.Println("%v requests per step", numRequests)
 
 	rampedRequest := &RampedRequest{*minConcurrent, *maxConcurrent, *step, *numRequests, "", x509Cert, x509Key}
 
