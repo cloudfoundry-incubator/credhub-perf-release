@@ -33,8 +33,8 @@ func main() {
 	}
 
 	fmt.Println("beginning [" + *requestType + "] tests on instance: " + *url)
-	fmt.Printf("concurrency from %v to %v, step by %v", minConcurrent, maxConcurrent, step)
-	fmt.Printf("%v requests per step", numRequests)
+	fmt.Printf("concurrency from %v to %v, step by %v", *minConcurrent, *maxConcurrent, *step)
+	fmt.Printf("%v requests per step", *numRequests)
 
 	rampedRequest := &RampedRequest{*minConcurrent, *maxConcurrent, *step, *numRequests, "", x509Cert, x509Key}
 
