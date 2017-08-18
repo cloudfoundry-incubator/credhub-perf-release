@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eux
+
 LOG_DIR=/var/vcap/sys/log/credhub_cannon
 NUM_REQUESTS="<%= p('cannon.num_requests') %>"
 MIN_CONCURRENT="<%= p('cannon.min_concurrent') %>"
