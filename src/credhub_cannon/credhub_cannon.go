@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"time"
 )
 
 func main() {
@@ -38,19 +37,18 @@ func main() {
 
 	rampedRequest := &RampedRequest{*minConcurrent, *maxConcurrent, *step, *numRequests, "", x509Cert, x509Key}
 
-	const credentialName = "perf-test-json"
 	switch *requestType {
 	case "set":
-		launchSetRequests(rampedRequest, *url, credentialName)
+		launchSetRequests(rampedRequest, *url)
 	case "get":
-		launchGetRequests(rampedRequest, *url, credentialName)
+		launchGetRequests(rampedRequest, *url)
 	case "interpolate":
-		launchInterpolateRequests(rampedRequest, *url, credentialName)
+		launchInterpolateRequests(rampedRequest, *url)
 	}
 }
 
-func launchSetRequests(rampedRequest *RampedRequest, url string, name string) {
-	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/setPerfResults-" + time.Now().UTC().Format("20060102150405") + ".csv"
+func launchSetRequests(rampedRequest *RampedRequest, url string) {
+	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/setPerfResults.csv"
 	requestBody := `{
   "name": "/c/p-spring-cloud-services/circuit-breaker/5c9073f9-677b-4eb7-8c95-4b89d66d2890/credential-json",
   "type": "json",
@@ -143,13 +141,13 @@ func launchSetRequests(rampedRequest *RampedRequest, url string, name string) {
 	rampedRequest.FireRequests(url+"/api/v1/data", "PUT", requestBody)
 }
 
-func launchGetRequests(rampedRequest *RampedRequest, url string, name string) {
-	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/getPerfResults-" + time.Now().UTC().Format("20060102150405") + ".csv"
+func launchGetRequests(rampedRequest *RampedRequest, url string) {
+	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/getPerfResults.csv"
 	rampedRequest.FireRequests(url+"/api/v1/data?name=/c/p-spring-cloud-services/circuit-breaker/5c9073f9-677b-4eb7-8c95-4b89d66d2890/credential-json", "GET", "")
 }
 
-func launchInterpolateRequests(rampedRequest *RampedRequest, url string, name string) {
-	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/interpolatePerfResults-" + time.Now().UTC().Format("20060102150405") + ".csv"
+func launchInterpolateRequests(rampedRequest *RampedRequest, url string) {
+	rampedRequest.LocalCSV = "/var/vcap/sys/log/credhub_cannon/interpolatePerfResults.csv"
 
 	requestBody := `{
   "p-circuit-breaker-dashboard": [
