@@ -42,11 +42,22 @@ def readThroughputData(filename):
     for cur in header_idxs[1:]:
         dfSection = pd.read_csv(StringIO(unicode(data[prev:cur])), parse_dates=['start-time'])
 
-        df = df.append(dfSection)
+        trimmedSection = trimEdges(dfSection)
+
+        if len(trimmedSection) > 0:
+            df = df.append(trimmedSection)
+
         prev = cur
     # Reset the index because it is a Frankenstein of smaller indexes
     df = df.reset_index().drop('index', axis=1)
     return df
+
+
+def trimEdges(data):
+    indexes = data.set_index('start-time').resample('1S').aggregate(lambda x: 1).index
+    testStartTime = indexes[0]
+    testEndTime = indexes[-1]
+    return data[(data['start-time'] >= testStartTime) & (data['start-time'] <= testEndTime)]
 
 def processThroughputData(data):
     buckets = data.set_index('start-time')['response-time'].resample('1S')
