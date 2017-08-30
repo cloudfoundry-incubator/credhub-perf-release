@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from patsy import dmatrices
+import six
 
 matplotlib.style.use('ggplot')
 
@@ -40,7 +41,7 @@ def readThroughputData(filename):
     df = pd.DataFrame()
     # Read each section delimited by the csv headers
     for cur in header_idxs[1:]:
-        dfSection = pd.read_csv(StringIO(unicode(data[prev:cur])), parse_dates=['start-time'])
+        dfSection = pd.read_csv(StringIO(six.text_type(data[prev:cur])), parse_dates=['start-time'])
 
         trimmedSection = trimEdges(dfSection)
 
