@@ -181,7 +181,7 @@ gradle-app.setting
 **/**/bin/
 
 # Pip config
-pip-selfcheck.json
+src/headroomplot/pip-selfcheck.json
 src/credhub_cannon/hey
 src/credhub_cannon/credhub_cannon
 
