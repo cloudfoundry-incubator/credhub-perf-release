@@ -13,21 +13,22 @@ import statsmodels.api as sm
 from patsy import dmatrices
 import six
 
-matplotlib.style.use('ggplot')
+if __name__ == '__main__':
+    matplotlib.style.use('ggplot')
 
-matplotlib.rcParams['figure.figsize'] = 9, 6
-matplotlib.rcParams['legend.loc'] = 'best'
-matplotlib.rcParams['figure.dpi'] = 120
+    matplotlib.rcParams['figure.figsize'] = 9, 6
+    matplotlib.rcParams['legend.loc'] = 'best'
+    matplotlib.rcParams['figure.dpi'] = 120
 
-# We'll need these packages for plotting fit lines
-warnings.filterwarnings('ignore')
-performanceResultsFile = sys.argv[1]
-assert os.path.isfile(performanceResultsFile), 'Missing performance results file'
+    # We'll need these packages for plotting fit lines
+    warnings.filterwarnings('ignore')
+    performanceResultsFile = sys.argv[1]
+    assert os.path.isfile(performanceResultsFile), 'Missing performance results file'
 
-compareDatasets = False
+    compareDatasets = False
 
-if compareDatasets:
-    assert os.path.isfile('old_perfResults.csv'), 'Missing old performance results file "old_perfResults.csv"'
+    if compareDatasets:
+        assert os.path.isfile('old_perfResults.csv'), 'Missing old performance results file "old_perfResults.csv"'
 
 
 def readThroughputData(filename):
@@ -68,21 +69,21 @@ def processThroughputData(data):
     throughputDataSet = throughputDataSet.fillna(method='ffill')
     return buckets, throughputDataSet
 
+if __name__ == '__main__':
+    goData = readThroughputData(performanceResultsFile)
 
-goData = readThroughputData(performanceResultsFile)
+    throughputBuckets, throughputData = processThroughputData(goData)
 
-throughputBuckets, throughputData = processThroughputData(goData)
+    if compareDatasets:
+        oldGoData = readThroughputData('old_perfResults.csv')
+        oldThroughputBuckets, oldThroughputData = processThroughputData(oldGoData)
 
-if compareDatasets:
-    oldGoData = readThroughputData('old_perfResults.csv')
-    oldThroughputBuckets, oldThroughputData = processThroughputData(oldGoData)
+    goData['throughput'] = throughputBuckets.transform(len).reset_index()['response-time']
+    goData.columns = ['start-time', 'latency', 'throughput']
 
-goData['throughput'] = throughputBuckets.transform(len).reset_index()['response-time']
-goData.columns = ['start-time', 'latency', 'throughput']
-
-if compareDatasets:
-    oldGoData['throughput'] = oldThroughputBuckets.transform(len).reset_index()['response-time']
-    oldGoData.columns = ['start-time', 'latency', 'throughput']
+    if compareDatasets:
+        oldGoData['throughput'] = oldThroughputBuckets.transform(len).reset_index()['response-time']
+        oldGoData.columns = ['start-time', 'latency', 'throughput']
 
 
 def generateFitLine(data):
@@ -96,32 +97,32 @@ def generateFitLine(data):
     fitLine = fit.predict(predictionInputs)
     return domain, fitLine, round(maxThroughput)
 
+if __name__ == '__main__':
+    domain, goFitLine, xLimit = generateFitLine(goData)
 
-domain, goFitLine, xLimit = generateFitLine(goData)
+    if compareDatasets:
+        oldDomain, oldGoFitLine, oldXLimit = generateFitLine(oldGoData)
 
-if compareDatasets:
-    oldDomain, oldGoFitLine, oldXLimit = generateFitLine(oldGoData)
+    fig, ax = plt.subplots()
 
-fig, ax = plt.subplots()
+    # Change the value of `c` to change the color. http://matplotlib.org/api/colors_api.html
+    ax = goData.plot(ax=ax, kind='scatter', x='throughput', y='latency', c='b', marker='.', alpha=0.2)
+    ax.plot(domain, goFitLine, c='b', lw=2)  # Plot the fit line
 
-# Change the value of `c` to change the color. http://matplotlib.org/api/colors_api.html
-ax = goData.plot(ax=ax, kind='scatter', x='throughput', y='latency', c='b', marker='.', alpha=0.2)
-ax.plot(domain, goFitLine, c='b', lw=2)  # Plot the fit line
+    if compareDatasets:
+        ax = oldGoData.plot(ax=ax, kind='scatter', x='throughput', y='latency', c='r', marker='.', alpha=0.2)
+        ax.plot(oldDomain, oldGoFitLine, c='r', lw=2)  # Plot the fit line
+        ax.legend(['after', 'before'])
 
-if compareDatasets:
-    ax = oldGoData.plot(ax=ax, kind='scatter', x='throughput', y='latency', c='r', marker='.', alpha=0.2)
-    ax.plot(oldDomain, oldGoFitLine, c='r', lw=2)  # Plot the fit line
-    ax.legend(['after', 'before'])
+    # To update x & y axis range change the parameters in function set_(x/y)lim(lower_limit, uppper_limit)
 
-# To update x & y axis range change the parameters in function set_(x/y)lim(lower_limit, uppper_limit)
+    ax.autoscale(True)
+    ax.autoscale_view(True, True, True)
+    plt.xlabel('Throughput (requests/sec)')
+    plt.ylabel('Latency (sec)')
+    plt.title('Headroom plot', y=1.05)
+    plt.plot()
 
-ax.autoscale(True)
-ax.autoscale_view(True, True, True)
-plt.xlabel('Throughput (requests/sec)')
-plt.ylabel('Latency (sec)')
-plt.title('Headroom plot', y=1.05)
-plt.plot()
-
-filenameForPlot = performanceResultsFile[:-4] + "Plot.png"
-plt.savefig(filenameForPlot)
-print ("saving graph to " + filenameForPlot)
+    filenameForPlot = performanceResultsFile[:-4] + "Plot.png"
+    plt.savefig(filenameForPlot)
+    print ("saving graph to " + filenameForPlot)
