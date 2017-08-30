@@ -179,6 +179,7 @@ gradle-app.setting
 **/**/include/
 **/**/lib/
 **/**/bin/
+*.pyc
 
 # Pip config
 src/headroomplot/pip-selfcheck.json
