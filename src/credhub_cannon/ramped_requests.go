@@ -16,6 +16,7 @@ type RampedRequest struct {
 	LocalCSV         string
 	X509Cert         string
 	X509Key          string
+	randomize		 bool
 }
 
 func (rr *RampedRequest) FireRequests(url, httpVerb, requestBody string) {
@@ -27,7 +28,7 @@ func (rr *RampedRequest) FireRequests(url, httpVerb, requestBody string) {
 		panic("Can't have less requests than number of concurrent threads")
 	}
 
-	rr.runBenchmark(url, httpVerb, requestBody, rr.NumberOfRequests, rr.MinConcurrent, rr.MaxConcurrent, rr.Step, 0, rr.X509Cert, rr.X509Key)
+	rr.runBenchmark(url, httpVerb, requestBody, rr.NumberOfRequests, rr.MinConcurrent, rr.MaxConcurrent, rr.Step, 0, rr.X509Cert, rr.X509Key, rr.randomize)
 }
 
 func writeFile(path string, data []byte) {
@@ -55,11 +56,12 @@ func (rr *RampedRequest) runBenchmark(
 	threshold int,
 	x509Cert,
 	x509Key string,
+	randomize bool,
 ) {
 
 	benchmarkData := new(bytes.Buffer)
 	for i := lowerConcurrency; i <= upperConcurrency; i += concurrencyStep {
-		heyData, benchmarkErr := run(url, httpVerb, requestBody, numRequests, i, threshold, x509Cert, x509Key)
+		heyData, benchmarkErr := run(url, httpVerb, requestBody, numRequests, i, threshold, x509Cert, x509Key, randomize)
 		if benchmarkErr != nil {
 			fmt.Fprintf(os.Stderr, "%s\n", benchmarkErr)
 			os.Exit(1)
@@ -78,7 +80,7 @@ func (rr *RampedRequest) runBenchmark(
 	}
 }
 
-func run(url, httpVerb, requestBody string, numRequests, concurrentRequests, rateLimit int, x509Cert, x509Key string) ([]byte, error) {
+func run(url, httpVerb, requestBody string, numRequests, concurrentRequests, rateLimit int, x509Cert, x509Key string, randomize bool) ([]byte, error) {
 	fmt.Fprintf(os.Stdout, "Running benchmark with %d requests, %d concurrency, and %d rate limit\n", numRequests, concurrentRequests, rateLimit)
 	args := []string{
 		"-n", strconv.Itoa(numRequests),
@@ -91,6 +93,9 @@ func run(url, httpVerb, requestBody string, numRequests, concurrentRequests, rat
 		"-disable-keepalive",
 		"-o", "csv",
 		url,
+	}
+	if randomize{
+		args = append(args, "--rand")
 	}
 
 	heyCmd := exec.Command("hey", args...)
@@ -108,6 +113,7 @@ func run(url, httpVerb, requestBody string, numRequests, concurrentRequests, rat
 	}
 	fmt.Println("returned from hey")
 	fmt.Println(out.String())
+	fmt.Errorf(stderr.String())
 	fmt.Println("done")
 	return []byte(out.String()), nil
 }
