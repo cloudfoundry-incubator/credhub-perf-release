@@ -1,7 +1,7 @@
 [submodule "src/github.com/rakyll/hey"]
 	path = src/github.com/rakyll/hey
 	url = git@github.com:cloudfoundry-incubator/hey.git
-	branch = x509
+	branch = master
 [submodule "src/github.com/vkuznet/x509proxy"]
 	path = src/github.com/vkuznet/x509proxy
 	url = git@github.com:vkuznet/x509proxy.git
