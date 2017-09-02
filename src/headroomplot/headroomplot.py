@@ -59,48 +59,51 @@ class PerformanceRunIterator():
         line = self._data[start:end]
         return six.text_type(line)
 
-def readThroughputData(filename):
-    perfData = PerfData(filename)
+
+def read_throughput_data(filename):
+    perf_data = PerfData(filename)
 
     df = pd.DataFrame()
-    for run in PerformanceRunIterator(perfData.data(), perfData.headers()):
-        run_dataframe = pd.read_csv(StringIO(run), parse_dates=[perfData.datetime_headers()])
+    for run in PerformanceRunIterator(perf_data.data(), perf_data.headers()):
+        run_dataframe = pd.read_csv(StringIO(run), parse_dates=[perf_data.datetime_headers()])
 
-        trimmedSection = trimEdges(run_dataframe)
+        trimmed_section = trim_edges(run_dataframe)
 
-        if len(trimmedSection) > 0:
-            df = df.append(trimmedSection)
+        if len(trimmed_section) > 0:
+            df = df.append(trimmed_section)
 
     # Reset the index because it is a Frankenstein of smaller indexes
     df = df.reset_index().drop('index', axis=1)
     return df
 
-def trimEdges(data):
+
+def trim_edges(data):
     indexes = data.set_index('start-time').resample('1S').aggregate(lambda x: 1).index
-    testStartTime = indexes[0]
-    testEndTime = indexes[-1]
-    return data[(data['start-time'] >= testStartTime) & (data['start-time'] <= testEndTime)]
+    test_start_time = indexes[0]
+    test_end_time = indexes[-1]
+    return data[(data['start-time'] >= test_start_time) & (data['start-time'] <= test_end_time)]
 
-def processThroughputData(data):
+
+def process_throughput_data(data):
     buckets = data.set_index('start-time')['response-time'].resample('1S')
-    throughputDataSet = buckets.aggregate({"throughput": lambda x: 0 if x.count() == 0 else x.count()})
+    throughput_data_set = buckets.aggregate({"throughput": lambda x: 0 if x.count() == 0 else x.count()})
 
-    throughputDataSet = throughputDataSet.reset_index()
-    throughputDataSet = throughputDataSet.fillna(method='ffill')
-    return buckets, throughputDataSet
+    throughput_data_set = throughput_data_set.reset_index()
+    throughput_data_set = throughput_data_set.fillna(method='ffill')
+    return buckets, throughput_data_set
 
 
-
-def generateFitLine(data):
+def generate_fit_line(data):
     y, x = dmatrices('latency ~ throughput', data=data, return_type='dataframe')
     fit = sm.GLM(y, x, family=sm.families.InverseGaussian(sm.families.links.inverse_squared)).fit()
-    maxThroughput = data['throughput'].max()
-    minThroughtput = data['throughput'].min()
-    domain = np.arange(minThroughtput, maxThroughput)
-    predictionInputs = np.ones((len(domain), 2))
-    predictionInputs[:, 1] = domain
-    fitLine = fit.predict(predictionInputs)
-    return domain, fitLine, round(maxThroughput)
+    max_throughput = data['throughput'].max()
+    min_throughput = data['throughput'].min()
+    domain = np.arange(min_throughput, max_throughput)
+    prediction_inputs = np.ones((len(domain), 2))
+    prediction_inputs[:, 1] = domain
+    fit_line = fit.predict(prediction_inputs)
+    return domain, fit_line, round(max_throughput)
+
 
 if __name__ == '__main__':
     matplotlib.style.use('ggplot')
@@ -119,13 +122,13 @@ if __name__ == '__main__':
     if compareDatasets:
         assert os.path.isfile('old_perfResults.csv'), 'Missing old performance results file "old_perfResults.csv"'
 
-    goData = readThroughputData(performanceResultsFile)
+    goData = read_throughput_data(performanceResultsFile)
 
-    throughputBuckets, throughputData = processThroughputData(goData)
+    throughputBuckets, throughputData = process_throughput_data(goData)
 
     if compareDatasets:
-        oldGoData = readThroughputData('old_perfResults.csv')
-        oldThroughputBuckets, oldThroughputData = processThroughputData(oldGoData)
+        oldGoData = read_throughput_data('old_perfResults.csv')
+        oldThroughputBuckets, oldThroughputData = process_throughput_data(oldGoData)
 
     goData['throughput'] = throughputBuckets.transform(len).reset_index()['response-time']
     goData.columns = ['start-time', 'latency', 'throughput']
@@ -134,10 +137,10 @@ if __name__ == '__main__':
         oldGoData['throughput'] = oldThroughputBuckets.transform(len).reset_index()['response-time']
         oldGoData.columns = ['start-time', 'latency', 'throughput']
 
-    domain, goFitLine, xLimit = generateFitLine(goData)
+    domain, goFitLine, xLimit = generate_fit_line(goData)
 
     if compareDatasets:
-        oldDomain, oldGoFitLine, oldXLimit = generateFitLine(oldGoData)
+        oldDomain, oldGoFitLine, oldXLimit = generate_fit_line(oldGoData)
 
     fig, ax = plt.subplots()
 
