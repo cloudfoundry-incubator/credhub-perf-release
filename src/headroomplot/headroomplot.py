@@ -78,24 +78,17 @@ class PerformanceRunIterator():
 
 
 def readThroughputData(filename):
-    with open(filename) as f:
-        data = f.read()
-    # Get locations of start-time,response-time headers in file
-    header_idxs = [m.start() for m in re.finditer('start-time,response-time', data)]
-    header_idxs.append(len(data))
-    prev = header_idxs[0]
+    perfData = PerfData(filename)
 
     df = pd.DataFrame()
-    # Read each section delimited by the csv headers
-    for cur in header_idxs[1:]:
-        dfSection = pd.read_csv(StringIO(six.text_type(data[prev:cur])), parse_dates=['start-time'])
+    for run in PerformanceRunIterator(perfData.data(), perfData.headers()):
+        run_dataframe = pd.read_csv(StringIO(run), parse_dates=[perfData.datetime_headers()])
 
-        trimmedSection = trimEdges(dfSection)
+        trimmedSection = trimEdges(run_dataframe)
 
         if len(trimmedSection) > 0:
             df = df.append(trimmedSection)
 
-        prev = cur
     # Reset the index because it is a Frankenstein of smaller indexes
     df = df.reset_index().drop('index', axis=1)
     return df
