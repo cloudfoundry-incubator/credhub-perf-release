@@ -50,6 +50,33 @@ class PerfData():
         return self.__DATETIME_HEADER__
 
 
+class PerformanceRunIterator():
+    def __init__(self, data, header):
+        self._data = data
+        self._current_index = 0
+        self._perf_header = header
+
+    def __iter__(self):
+        self._header_indexes = [m.start() for m in re.finditer(self._perf_header, self._data)]
+        self._header_indexes.append(len(self._data))
+
+        return self
+
+    def next(self):
+        if self._current_index + 1 >= len(self._header_indexes):
+            raise StopIteration
+        line = self.__getitemAt__(self._current_index)
+        self._current_index = self._current_index + 1
+
+        return line
+
+    def __getitemAt__(self, position):
+        start = self._header_indexes[position]
+        end = self._header_indexes[position + 1]
+        line = self._data[start:end]
+        return six.text_type(line)
+
+
 def readThroughputData(filename):
     with open(filename) as f:
         data = f.read()

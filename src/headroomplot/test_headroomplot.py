@@ -2,6 +2,7 @@ import os
 
 from unittest import TestCase
 from headroomplot import readThroughputData
+from headroomplot import PerformanceRunIterator
 from headroomplot import PerfData
 
 
@@ -23,6 +24,31 @@ class TestPerfData(TestCase):
         perf_data = PerfData(self.working_file)
         self.assertEquals("start-time", perf_data.datetime_headers())
 
+
+class TestPerformanceRunIterator(TestCase):
+
+    def setUp(self):
+        self._header = "start-time,response-time"
+
+    def testWorksWithOneRun(self):
+        data = self._header +"\n2017-08-25T21:07:33.0080871Z,0.0775"
+
+        for run in PerformanceRunIterator(data, self._header):
+            self.assertEquals(data, run)
+
+    def testWorksWithMoreThanOneRun(self):
+
+        run_item = self._header +"\n2017-08-25T21:07:33.0080871Z,0.0775\n"
+        run_item2 = self._header + "\n2017-08-25T21:07:33.0080871Z,0.0779\n"
+        data = run_item + run_item2
+        run_items = [run_item, run_item2]
+
+        index = 0
+        for run in PerformanceRunIterator(data, self._header):
+            self.assertEquals(run_items[index], run)
+            index = index + 1
+
+        self.assertEquals(2, index)
 
 class TestReadThroughputData(TestCase):
     THIS_DIR = os.path.dirname(os.path.abspath(__file__))
