@@ -48,12 +48,12 @@ class PerformanceRunIterator():
     def next(self):
         if self._current_index + 1 >= len(self._header_indexes):
             raise StopIteration
-        line = self.__getitemAt__(self._current_index)
+        line = self._line_at_index(self._current_index)
         self._current_index = self._current_index + 1
 
         return line
 
-    def __getitemAt__(self, position):
+    def _line_at_index(self, position):
         start = self._header_indexes[position]
         end = self._header_indexes[position + 1]
         line = self._data[start:end]
