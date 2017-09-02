@@ -20,7 +20,7 @@ class TestReadThroughputData(TestCase):
     def test_return_data_frame_with_the_last_second_trimmed_out(self):
         working_file = os.path.join(self.THIS_DIR, 'test_data/working.csv')
         data = readThroughputData(working_file)
-        self.assertEquals(len(data), 6)
+        self.assertEquals(len(data), 4)
 
     def test_return_empty_when_test_date_is_only_one_second(self):
         a_second_only_file = os.path.join(self.THIS_DIR, 'test_data/a_second_only.csv')
