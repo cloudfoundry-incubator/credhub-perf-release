@@ -31,6 +31,25 @@ if __name__ == '__main__':
         assert os.path.isfile('old_perfResults.csv'), 'Missing old performance results file "old_perfResults.csv"'
 
 
+class PerfData():
+    __DATETIME_HEADER__ = "start-time"
+    __PERF_HEADER__ = __DATETIME_HEADER__ + ",response-time"
+
+    def __init__(self, filename):
+        self._filename = filename
+
+    def data(self):
+        with open(self._filename) as f:
+            _data = f.read()
+        return _data
+
+    def headers(self):
+        return self.__PERF_HEADER__
+
+    def datetime_headers(self):
+        return self.__DATETIME_HEADER__
+
+
 def readThroughputData(filename):
     with open(filename) as f:
         data = f.read()

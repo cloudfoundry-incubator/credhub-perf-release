@@ -2,6 +2,26 @@ import os
 
 from unittest import TestCase
 from headroomplot import readThroughputData
+from headroomplot import PerfData
+
+
+class TestPerfData(TestCase):
+    THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    def setUp(self):
+        self.working_file = os.path.join(self.THIS_DIR, 'test_data/working.csv')
+
+    def testDataReturnFileContent(self):
+        perf_data = PerfData(self.working_file)
+        self.assertEquals("start-time,response-time\n2017-08-25T21:07:33.0080871Z,0.0775\n2017-08-25T21:07:33.0855854Z,0.0272\n2017-08-25T21:07:34.001946224Z,0.0249\n2017-08-25T21:07:34.02683099Z,0.0378\nstart-time,response-time\n2017-08-25T21:07:35.114091565Z,0.029\n2017-08-25T21:07:36.144091565Z,0.029\n2017-08-25T21:07:37.144091565Z,0.029", perf_data.data())
+
+    def testHeaderReturnsPerfHeader(self):
+        perf_data = PerfData(self.working_file)
+        self.assertEquals("start-time,response-time", perf_data.headers())
+
+    def testDatetimeHeadersReturnsHeadersThatHoldDatetime(self):
+        perf_data = PerfData(self.working_file)
+        self.assertEquals("start-time", perf_data.datetime_headers())
 
 
 class TestReadThroughputData(TestCase):
