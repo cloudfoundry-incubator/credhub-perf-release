@@ -13,23 +13,6 @@ import statsmodels.api as sm
 from patsy import dmatrices
 import six
 
-if __name__ == '__main__':
-    matplotlib.style.use('ggplot')
-
-    matplotlib.rcParams['figure.figsize'] = 9, 6
-    matplotlib.rcParams['legend.loc'] = 'best'
-    matplotlib.rcParams['figure.dpi'] = 120
-
-    # We'll need these packages for plotting fit lines
-    warnings.filterwarnings('ignore')
-    performanceResultsFile = sys.argv[1]
-    assert os.path.isfile(performanceResultsFile), 'Missing performance results file'
-
-    compareDatasets = False
-
-    if compareDatasets:
-        assert os.path.isfile('old_perfResults.csv'), 'Missing old performance results file "old_perfResults.csv"'
-
 
 class PerfData():
     __DATETIME_HEADER__ = "start-time"
@@ -76,7 +59,6 @@ class PerformanceRunIterator():
         line = self._data[start:end]
         return six.text_type(line)
 
-
 def readThroughputData(filename):
     perfData = PerfData(filename)
 
@@ -93,7 +75,6 @@ def readThroughputData(filename):
     df = df.reset_index().drop('index', axis=1)
     return df
 
-
 def trimEdges(data):
     indexes = data.set_index('start-time').resample('1S').aggregate(lambda x: 1).index
     testStartTime = indexes[0]
@@ -108,7 +89,36 @@ def processThroughputData(data):
     throughputDataSet = throughputDataSet.fillna(method='ffill')
     return buckets, throughputDataSet
 
+
+
+def generateFitLine(data):
+    y, x = dmatrices('latency ~ throughput', data=data, return_type='dataframe')
+    fit = sm.GLM(y, x, family=sm.families.InverseGaussian(sm.families.links.inverse_squared)).fit()
+    maxThroughput = data['throughput'].max()
+    minThroughtput = data['throughput'].min()
+    domain = np.arange(minThroughtput, maxThroughput)
+    predictionInputs = np.ones((len(domain), 2))
+    predictionInputs[:, 1] = domain
+    fitLine = fit.predict(predictionInputs)
+    return domain, fitLine, round(maxThroughput)
+
 if __name__ == '__main__':
+    matplotlib.style.use('ggplot')
+
+    matplotlib.rcParams['figure.figsize'] = 9, 6
+    matplotlib.rcParams['legend.loc'] = 'best'
+    matplotlib.rcParams['figure.dpi'] = 120
+
+    # We'll need these packages for plotting fit lines
+    warnings.filterwarnings('ignore')
+    performanceResultsFile = sys.argv[1]
+    assert os.path.isfile(performanceResultsFile), 'Missing performance results file'
+
+    compareDatasets = False
+
+    if compareDatasets:
+        assert os.path.isfile('old_perfResults.csv'), 'Missing old performance results file "old_perfResults.csv"'
+
     goData = readThroughputData(performanceResultsFile)
 
     throughputBuckets, throughputData = processThroughputData(goData)
@@ -124,19 +134,6 @@ if __name__ == '__main__':
         oldGoData['throughput'] = oldThroughputBuckets.transform(len).reset_index()['response-time']
         oldGoData.columns = ['start-time', 'latency', 'throughput']
 
-
-def generateFitLine(data):
-    y, x = dmatrices('latency ~ throughput', data=data, return_type='dataframe')
-    fit = sm.GLM(y, x, family=sm.families.InverseGaussian(sm.families.links.inverse_squared)).fit()
-    maxThroughput = data['throughput'].max()
-    minThroughtput = data['throughput'].min()
-    domain = np.arange(minThroughtput, maxThroughput)
-    predictionInputs = np.ones((len(domain), 2))
-    predictionInputs[:, 1] = domain
-    fitLine = fit.predict(predictionInputs)
-    return domain, fitLine, round(maxThroughput)
-
-if __name__ == '__main__':
     domain, goFitLine, xLimit = generateFitLine(goData)
 
     if compareDatasets:
