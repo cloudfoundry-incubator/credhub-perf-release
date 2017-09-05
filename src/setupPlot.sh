@@ -1,7 +1,7 @@
 #!/bin/bash
 
-sudo pip3 install virtualenv
+sudo pip install virtualenv
 virtualenv --no-site-packages headroomplot
 cd headroomplot
 source bin/activate
-pip3 install -r requirements.txt
+pip install -r requirements.txt

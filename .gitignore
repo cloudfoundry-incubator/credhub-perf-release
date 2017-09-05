@@ -179,14 +179,17 @@ gradle-app.setting
 **/**/include/
 **/**/lib/
 **/**/bin/
+*.pyc
 
 # Pip config
-pip-selfcheck.json
+src/headroomplot/pip-selfcheck.json
 src/credhub_cannon/hey
 src/credhub_cannon/credhub_cannon
 
 # Ignore credhub_cannot results
+!src/headroomplot/test_data/*.csv
 *.csv
+
 
 # BOSH
 config/private.yml
