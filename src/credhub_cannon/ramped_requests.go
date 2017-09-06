@@ -92,11 +92,11 @@ func run(url, httpVerb, requestBody string, numRequests, concurrentRequests, rat
 		"-disable-compression",
 		"-disable-keepalive",
 		"-o", "csv",
-		url,
 	}
 	if randomize{
 		args = append(args, "--rand")
 	}
+	args = append(args, url)
 
 	heyCmd := exec.Command("hey", args...)
 	var out bytes.Buffer
