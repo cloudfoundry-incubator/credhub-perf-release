@@ -123,40 +123,16 @@ bosh -e boshenv update-cloud-config /path/to/cloud_config.yml
 
 ## Deploying CredHub via Bosh
 
-1. Create an `ops` file with properties specific to your CredHub deployment
+1. Create a `vars` file with properties specific to your CredHub deployment
    ```yml
-   - type: replace
-     path: /instance_groups/name=credhub-perf-cluster/jobs/name=credhub/properties/credhub/data_storage/password
-     value: #REPLACE ME
-   
-   - type: replace
-     path: /instance_groups/name=credhub-perf-cluster/jobs/name=credhub/properties/credhub/data_storage/host
-     value: #REPLACE ME
-   
-   - type: replace
-     path: /instance_groups/name=credhub-perf-cluster/jobs/name=credhub/properties/credhub/data_storage/port
-     value: #REPLACE ME
-   
-   - type: replace
-     path: /instance_groups/name=credhub-perf-cluster/jobs/name=credhub/properties/credhub/data_storage/database
-     value: #REPLACE ME
-   
-   - type: replace
-     path: /instance_groups/name=credhub-perf-cluster/jobs/name=credhub/properties/credhub/authentication/uaa/url
-     value: #REPLACE ME
-   
-   - type: replace
-     path: /instance_groups/name=credhub-perf-cluster/jobs/name=credhub/properties/credhub/authentication/uaa/ca_certs
-     value:
-     - #REPLACE ME
-   
-   - type: replace
-     path: /instance_groups/name=credhub-perf-cluster/jobs/name=credhub/properties/credhub/authentication/uaa/verification_key
-     value: #REPLACE ME
-   
-   - type: replace
-     path: /variables/name=credhub-tls/options/ca
-     value: #REPLACE ME
+   credhub_ca_name: #REPLACE ME
+   db_password: #REPLACE ME
+   db_host: #REPLACE ME
+   db_port: #REPLACE ME
+   db_name: #REPLACE ME
+   uaa_url: #REPLACE ME
+   uaa_verification_key: #REPLACE ME
+   uaa_ca: #REPLACE ME
    ```
 1. Deploy credhub with `credhub_cannon` errand co-located using `sample-manifests/credhub-ha-perf.yml`
 
@@ -169,7 +145,7 @@ bosh -e boshenv update-cloud-config /path/to/cloud_config.yml
     -v request_type=<REQUEST_TYPE> \
     -v num_requests=<NUM_REQUESTS> \
     -v credhub_host=<CREDHUB_HOST> \
-    -o /path/to/ops/file
+    -l /path/to/vars/file
    ```
 
 Now you wait.
