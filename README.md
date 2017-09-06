@@ -5,10 +5,12 @@ Setting up Performance Test Framework
 This documents aims to walk you through the setup required to run the performance test rig for **Credhub** on your own.
 
 ----------
+## Table of Contents
+1. [IaaS Setup for the BOSH Deployment](#iaas-setup-for-the-bosh-deployment)
+1. [Deploying CredHub via Bosh](#deploying-credhub-via-bosh)
+1. [Running the Performance Test](#running-the-performance-test)
 
-
-The Bosh Deployment
--------------
+## IaaS Setup for the BOSH Deployment
 
 The subject is deployed entirely on AWS. We are testing a Credhub cluster and each Credhub is deployed on a m4.large VM behind a load-balancer. The UAA is also deployed on a separate m4.large VM. The Credhub cluster uses a Postgres RDS as its datastore while the UAA uses an internally deployed postgres.
 
@@ -119,9 +121,9 @@ Ensure you have updated your cloud-config using:
 bosh -e boshenv update-cloud-config /path/to/cloud_config.yml
 ``` 
 
-## Bosh Release for the Performance Testing of CredHub
+## Deploying CredHub via Bosh
 
-1. Create an `ops` file with variables specific to your credhub deployment
+1. Create an `ops` file with properties specific to your CredHub deployment
    ```yml
    - type: replace
      path: /instance_groups/name=credhub-perf-cluster/jobs/name=credhub/properties/credhub/data_storage/password
@@ -198,3 +200,19 @@ A healthy response should look like the following:
 ```
 
 Congratulations. You are now ready to performance test Credhub.
+
+## Running the Performance Test
+
+Run performance tests via the bosh errand
+
+```bash
+bosh -d credhub-ha-perf run-errand credhub_cannon --download-logs
+```
+
+The errand logs contain the data needed to build the plot as a `csv` file. To build headroom plot, run:
+ 
+```bash
+python src/headroomplot/headroomplot.py <YOUR-DATA-FILE>.csv
+```
+> **Note**
+> To install the requirement for headroom plot to run simply run `pip install -r src/headroomplot/requirements.txt`
