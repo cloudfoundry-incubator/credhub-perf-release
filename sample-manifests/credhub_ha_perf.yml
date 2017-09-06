@@ -24,7 +24,7 @@ variables:
 - name: credhub-tls
   type: certificate
   options:
-    ca: #REPLACE ME
+    ca: ((credhub_ca_name))
     common_name: ((credhub_host))
     alternative_names:
     - ((credhub_host))
@@ -58,16 +58,17 @@ instance_groups:
         data_storage:
           type: postgres
           username: postgres
-          password: #REPLACE ME
-          host: #REPLACE ME
-          port: #REPLACE ME
-          database: #REPLACE ME
+          password: ((db_password))
+          host: ((db_host))
+          port: ((db_port))
+          database: ((db_name))
           require_tls: false
         authentication:
           uaa:
-            url: #REPLACE ME
-            verification_key: #REPLACE ME
-            ca_certs: #REPLACE ME
+            url: ((uaa_url))
+            verification_key: ((uaa_verification_key))
+            ca_certs:
+            - ((uaa_ca))
           mutual_tls:
             trusted_cas:
             - ((mtls/ca.certificate))
