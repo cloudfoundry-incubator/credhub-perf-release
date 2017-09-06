@@ -182,7 +182,7 @@ You should now have a load balanced Credhub cluster you can interact with.
 
 A quick health check can be run using:
 ```bash
-curl -k https://your-loadbalancer-dns-name:8844/info
+curl -k https://<YOUR-LOADBALANCER-DNS-NAME>:8844/info
 ``` 
 
 A healthy response should look like the following:
@@ -215,4 +215,4 @@ The errand logs contain the data needed to build the plot as a `csv` file. To bu
 python src/headroomplot/headroomplot.py <YOUR-DATA-FILE>.csv
 ```
 > **Note**
-> To install the requirement for headroom plot to run simply run `pip install -r src/headroomplot/requirements.txt`
+> To install the required libraries for headroomplot, run `pip install -r src/headroomplot/requirements.txt`
