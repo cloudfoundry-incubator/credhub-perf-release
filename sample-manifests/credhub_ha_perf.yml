@@ -1,0 +1,114 @@
+---
+name: credhub-ha-perf
+
+releases:
+- name: credhub
+  version: latest
+- name: credhub-perf
+  version: latest
+
+stemcells:
+- alias: default
+  name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+  version: latest
+
+update:
+  canaries: 2
+  max_in_flight: 10
+  update_watch_time: 10000-120000
+  canary_watch_time: 10000-120000
+
+variables:
+- name: encryption-password
+  type: password
+- name: credhub-tls
+  type: certificate
+  options:
+    ca: #REPLACE ME
+    common_name: ((credhub_host))
+    alternative_names:
+    - ((credhub_host))
+- name: mtls/ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: mtls_ca
+- name: mtls/auth
+  type: certificate
+  options:
+    ca: mtls/ca
+    organization_unit: app:32d86580-d618-42d1-82c5-a1747c926741
+    extended_key_usage:
+    - client_auth
+instance_groups:
+- name: credhub-perf-cluster
+  instances: ((instances))
+  azs:
+  - z1
+  vm_type: perf-vms
+  persistent_disk_type: disks
+  stemcell: default
+  networks:
+  - name: private
+  jobs:
+  - name: credhub
+    release: credhub
+    properties:
+      credhub:
+        data_storage:
+          type: postgres
+          username: postgres
+          password: #REPLACE ME
+          host: #REPLACE ME
+          port: #REPLACE ME
+          database: #REPLACE ME
+          require_tls: false
+        authentication:
+          uaa:
+            url: #REPLACE ME
+            verification_key: #REPLACE ME
+            ca_certs: #REPLACE ME
+          mutual_tls:
+            trusted_cas:
+            - ((mtls/ca.certificate))
+        tls: ((credhub-tls))
+        max_heap_size: 7168
+        encryption:
+          keys:
+          - provider_name: internal-provider
+            encryption_password: ((encryption-password))
+            active: true
+          providers:
+            - name: internal-provider
+              type: internal
+- name: perf-test
+  instances: 1
+  lifecycle: errand
+  azs:
+  - z1
+  vm_type: vms
+  vm_extensions:
+  - publicly_accessible
+  - auto_assigned_ip
+  persistent_disk_type: disks
+  stemcell: default
+  networks:
+  - name: private
+    default:
+    - dns
+    - gateway
+  jobs:
+  - name: credhub_cannon
+    release: credhub-perf
+    properties:
+      credhub:
+        server:
+          url: https://((credhub_host)):8844
+      cannon:
+        credhub_auth:
+          mtls: ((mtls/auth))
+        num_requests: ((num_requests))
+        min_concurrent: ((min_concurrent))
+        max_concurrent: ((max_concurrent))
+        step: ((step_size))
+        request_type: ((request_type))
