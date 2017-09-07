@@ -123,6 +123,13 @@ bosh -e boshenv update-cloud-config /path/to/cloud_config.yml
 
 ## Deploying CredHub via Bosh
 
+1. Create and upload bosh release:
+   ```bash
+   ./scripts/update
+   bosh create-release
+   bosh upload-release
+   ```
+
 1. Create a `vars` file with properties specific to your CredHub deployment
    ```yml
    credhub_ca_name: #REPLACE ME
