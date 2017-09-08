@@ -1,0 +1,225 @@
+---
+name: credhub-perf
+
+releases:
+- name: credhub
+  version: latest
+- name: credhub-perf
+  version: latest
+- name: uaa
+  version: latest
+- name: postgres
+  version: latest
+
+stemcells:
+- alias: default
+  os: ubuntu-trusty
+  version: latest
+
+update:
+  canaries: 1
+  max_in_flight: 10
+  update_watch_time: 10000-120000
+  canary_watch_time: 10000-120000
+
+variables:
+- name: encryption-password
+  type: password
+- name: credhub-ca
+  type: certificate 
+  options: 
+    is_ca: true
+    common_name: CredHub CA
+- name: credhub-tls
+  type: certificate
+  options:
+    ca: credhub-ca
+    common_name: ((credhub_host))
+    alternative_names:
+    - ((credhub_host))
+- name: mtls/ca
+  type: certificate
+  options:
+    is_ca: true
+    common_name: mtls_ca
+- name: mtls/auth
+  type: certificate
+  options:
+    ca: mtls/ca
+    organization_unit: app:32d86580-d618-42d1-82c5-a1747c926741
+    extended_key_usage:
+    - client_auth
+- name: uaa-tls
+  type: certificate
+  options:
+    ca: credhub-ca
+    common_name: ((uaa_ip_address))
+    alternative_names:
+    - ((uaa_ip_address))
+- name: uaa-jwt
+  type: rsa
+  options:
+    key_length: 4096
+- name: uaa-users-admin
+  type: password
+- name: uaa-admin
+  type: password
+- name: uaa-login
+  type: password
+- name: database-admin
+  type: password
+
+instance_groups:
+- name: uaa
+  instances: 1
+  azs:
+  - z1
+  vm_type: medium
+  persistent_disk_type: disks
+  stemcell: default
+  networks:
+  - name: private
+    static_ips: 
+    - ((uaa_ip_address))
+  jobs:
+  - name: postgres
+    release: postgres
+    properties:
+      databases:
+        address: 127.0.0.1
+        port: 5432
+        databases:
+        - name: uaa
+        roles:
+        - name: admin
+          password: ((database-admin))
+
+  - name: uaa
+    release: uaa
+    properties:
+      uaa:
+        url: https://((uaa_ip_address)):8443
+        scim:
+          users:
+          - name: admin
+            password: ((uaa-users-admin))
+            groups:
+              - scim.write
+              - scim.read
+              - credhub.read
+              - credhub.write
+        clients:
+          credhub_cli:
+            override: true
+            authorized-grant-types: password,refresh_token
+            scope: credhub.read,credhub.write
+            authorities: uaa.resource
+            access-token-validity: 30
+            refresh-token-validity: 3600
+            secret: ""
+        admin: {client_secret: ((uaa-admin))}
+        login: {client_secret: ((uaa-login))}
+        zones: {internal: {hostnames: []}}
+        sslCertificate: ((uaa-tls.certificate))
+        sslPrivateKey: ((uaa-tls.private_key))
+        jwt:
+          revocable: true
+          policy:
+            active_key_id: key-1
+            keys:
+              key-1:
+                signingKey: ((uaa-jwt.private_key))
+      uaadb:
+        address: 127.0.0.1
+        port: 5432
+        db_scheme: postgresql
+        tls_enabled: false
+        databases:
+        - tag: uaa
+          name: uaa
+        roles:
+        - tag: admin
+          name: admin
+          password: ((database-admin))
+      login:
+        saml:
+          serviceProviderCertificate: ((uaa-tls.certificate))
+          serviceProviderKey: ((uaa-tls.private_key))
+          serviceProviderKeyPassword: ""
+
+- name: credhub-perf-cluster
+  instances: ((credhub_instances))
+  azs:
+  - z1
+  vm_type: perf-vms
+  vm_extensions: 
+  - perf_credhub_load_balancer
+  persistent_disk_type: disks
+  stemcell: default
+  networks:
+  - name: private
+  jobs:
+  - name: credhub
+    release: credhub
+    properties:
+      credhub:
+        data_storage:
+          type: ((db_type))
+          username: ((db_username))
+          password: ((db_password))
+          host: ((db_host))
+          port: ((db_port))
+          database: ((db_database_name))
+          require_tls: false
+        authentication:
+          uaa:
+            url: https://((uaa_ip_address)):8443
+            verification_key: ((uaa-jwt.public_key))
+            ca_certs:
+            - ((uaa-tls.ca))
+          mutual_tls:
+            trusted_cas:
+            - ((mtls/ca.certificate))
+        tls: ((credhub-tls))
+        max_heap_size: 7168
+        encryption:
+          keys:
+          - provider_name: internal-provider
+            encryption_password: ((encryption-password))
+            active: true
+          providers:
+            - name: internal-provider
+              type: internal
+
+- name: perf-test
+  instances: 1
+  lifecycle: errand
+  azs:
+  - z1
+  vm_type: medium
+  vm_extensions:
+  - publicly_accessible
+  - auto_assigned_ip
+  persistent_disk_type: disks
+  stemcell: default
+  networks:
+  - name: private
+    default:
+    - dns
+    - gateway
+  jobs:
+  - name: credhub_cannon
+    release: credhub-perf
+    properties:
+      credhub:
+        server:
+          url: https://((credhub_host)):8844
+      cannon:
+        credhub_auth:
+          mtls: ((mtls/auth))
+        request_type: ((requests_type))
+        min_concurrent: ((minimum_concurrency))
+        max_concurrent: ((maximum_concurrency))
+        step: ((concurrency_step_size))
+        num_requests: ((requests_per_step))
+

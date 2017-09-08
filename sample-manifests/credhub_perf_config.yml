@@ -1,0 +1,21 @@
+# CredHub host - Set to the hostname or IP of your load balancer
+credhub_host:
+# Internal IP address for UAA to listen on
+uaa_ip_address:
+
+# Database information
+db_type:
+db_host:
+db_port:
+db_username: 
+db_password: 
+db_database_name:
+
+# Performance test information
+credhub_instances:
+requests_type: # get, set, or interpolate
+minimum_concurrency:
+maximum_concurrency:
+concurrency_step_size:
+requests_per_step:
+

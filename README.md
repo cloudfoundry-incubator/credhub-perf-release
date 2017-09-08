@@ -1,8 +1,7 @@
-
 Setting up Performance Test Framework
 =========================
 
-This documents aims to walk you through the setup required to run the performance test rig for **Credhub** on your own.
+This documents aims to walk you through the setup required to run the performance test rig for **CredHub** on your own.
 
 ----------
 ## Table of Contents
@@ -12,9 +11,9 @@ This documents aims to walk you through the setup required to run the performanc
 
 ## IaaS Setup for the BOSH Deployment
 
-The subject is deployed entirely on AWS. We are testing a Credhub cluster and each Credhub is deployed on a m4.large VM behind a load-balancer. The UAA is also deployed on a separate m4.large VM. The Credhub cluster uses a Postgres RDS as its datastore while the UAA uses an internally deployed postgres.
+The example below illustrates configuring infrastructure to run performance tests on AWS, however, the concepts should hold for alternative infrastructures. We are testing a CredHub cluster, with each instance deployed on a VM behind a load-balancer. The UAA is deployed on a separate VM. The CredHub cluster uses a Postgres RDS as its datastore while the UAA uses an internally deployed postgres.
 
-#### Setting up a load balancer 
+#### Setting up a load balancer
 
 Update your *cloudformation.json* with the the configuration required to add a load balancer which resembles the following:
 
@@ -46,9 +45,9 @@ Update your *cloudformation.json* with the the configuration required to add a l
 
 Upload the updated *cloudformation.json* to AWS which should create your load-balancer.
 
-On the AWS console,  under the EC2 Dashboard, you will have a new addition in the LoadBalancers section. 
+On the AWS console,  under the EC2 Dashboard, you will have a new addition in the LoadBalancers section.
 This would be a good time to create a CNAME in the Route53 Dashboard for the **DNS Name** of your LoadBalancer.
-Additionally note the **Name** of the LoadBalancer as this will be required while defining a vm_type for your Credhub instances.
+Additionally note the **Name** of the LoadBalancer as this will be required while defining a vm_type for your CredHub instances.
 
 Now in the *cloud-config.yml* file, add a section under *vm_types* as follows:
 
@@ -64,11 +63,11 @@ Now in the *cloud-config.yml* file, add a section under *vm_types* as follows:
 ```
 
 > **Note:**
-Particular attention must be placed to the *auto_assign_public_ip* flag. In our configuration we ensure UAA can accept incoming traffic from all IPs. Ensure your security groups are defined as such. In case you want to ensure only requests from certain IPs are forwarded to UAA, ensure the *auto_assign_public_ip* flag is false, and ensure an elastic IP is assigned to each Credhub instance and that communication from each of those IPs are allowed by the security group UAA has been defined in.
+Particular attention must be placed to the *auto_assign_public_ip* flag. In our configuration we ensure UAA can accept incoming traffic from all IPs. Ensure your security groups are defined as such. In case you want to ensure only requests from certain IPs are forwarded to UAA, ensure the *auto_assign_public_ip* flag is false, and ensure an elastic IP is assigned to each CredHub instance and that communication from each of those IPs are allowed by the security group UAA has been defined in.
 
 #### Setting up an RDS instance
 
-Find below the addition required to *cloudformation.json* to setup an RDS instance with Postgres running on it. You will need to create a DBSubnetGroup for it and ensure that the DBSubnetGroup has subnets within it that are on different availability zones. 
+Find below the addition required to *cloudformation.json* to setup an RDS instance with Postgres running on it. You will need to create a DBSubnetGroup for it and ensure that the DBSubnetGroup has subnets within it that are on different availability zones.
 
 ```json
     "CredHubPerformanceRDSSubnet": {
@@ -119,54 +118,38 @@ Find below the addition required to *cloudformation.json* to setup an RDS instan
 Ensure you have updated your cloud-config using:
 ```bash
 bosh -e boshenv update-cloud-config /path/to/cloud_config.yml
-``` 
+```
 
-## Deploying CredHub via Bosh
+## Deploying CredHub Cluster and Performance Errand with BOSH
 
-1. Create and upload bosh release:
+1. Create and upload the credhub-perf-release BOSH release
    ```bash
+   git clone git@github.com:cloudfoundry-incubator/credhub-perf-release.git .
    ./scripts/update
    bosh create-release
    bosh upload-release
    ```
 
-1. Create a `vars` file with properties specific to your CredHub deployment
-   ```yml
-   credhub_ca_name: #REPLACE ME
-   db_password: #REPLACE ME
-   db_host: #REPLACE ME
-   db_port: #REPLACE ME
-   db_name: #REPLACE ME
-   uaa_url: #REPLACE ME
-   uaa_verification_key: #REPLACE ME
-   uaa_ca: #REPLACE ME
-   ```
-1. Deploy credhub with `credhub_cannon` errand co-located using `sample-manifests/credhub-ha-perf.yml`
+1. Update the sample [`credhub_perf_config.yml`](sample-manifests/credhub_perf_config.yml) file with configurations for your environment and intended tests
+
+1. Deploy CredHub with `credhub_cannon` errand co-located using `sample-manifests/credhub-ha-perf.yml`
 
    ```bash
-   bosh deploy sample-manifests/credhub_ha_perf.yml \
-    -v instances=<INSTANCES> \
-    -v min_concurrent=<MIN_CONCURRENT> \
-    -v max_concurrent=<MAX_CONCURRENT> \
-    -v step_size=<STEP_SIZE> \
-    -v request_type=<REQUEST_TYPE> \
-    -v num_requests=<NUM_REQUESTS> \
-    -v credhub_host=<CREDHUB_HOST> \
-    -l /path/to/vars/file
+   bosh deploy sample-manifests/credhub_perf.yml --vars-file sample-manifests/credhub_perf_config.yml
    ```
 
 Now you wait.
 
 > **Troubleshooting common deployment failures:**
-> - Check your firewall rules. Are  they setup the way you expect them to be. Can the Credhub instances talk to UAA.
+> - Check your firewall rules. Are  they setup the way you expect them to be. Can the CredHub instances talk to UAA.
 > - Check your certificates. Do the CA's have the rights IPs defined in them? Are you passing around the correct certificates?
 
-You should now have a load balanced Credhub cluster you can interact with.
+You should now have a load balanced CredHub cluster you can interact with.
 
 A quick health check can be run using:
 ```bash
 curl -k https://<YOUR-LOADBALANCER-DNS-NAME>:8844/info
-``` 
+```
 
 A healthy response should look like the following:
 
@@ -182,20 +165,20 @@ A healthy response should look like the following:
 }
 ```
 
-Congratulations. You are now ready to performance test Credhub.
+Congratulations. You are now ready to performance test CredHub.
 
 ## Running the Performance Test
 
-Run performance tests via the bosh errand
+Run performance tests via the BOSH errand
 
 ```bash
-bosh -d credhub-ha-perf run-errand credhub_cannon --download-logs
+bosh -d credhub-perf run-errand credhub_cannon --download-logs
 ```
 
-The errand logs contain the data needed to build the plot as a `csv` file. To build headroom plot, run:
- 
+The errand will return logs as a tgz file, which contains the data needed to build the plot as a `csv` file. To build headroom plot, untar the logs then run:
+
 ```bash
 python src/headroomplot/headroomplot.py <YOUR-DATA-FILE>.csv
 ```
 > **Note**
-> To install the required libraries for headroomplot, run `pip install -r src/headroomplot/requirements.txt`
+> To install the required libraries for headroomplot, run `pip install -r src/headroomplot/requirements.txt`. If you experience import errors after installing the libraries, you may need to add the packages to your python path, like `export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/site-packages`.
