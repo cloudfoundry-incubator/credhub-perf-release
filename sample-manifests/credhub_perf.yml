@@ -152,8 +152,6 @@ instance_groups:
   azs:
   - z1
   vm_type: perf-vms
-  vm_extensions: 
-  - perf_credhub_load_balancer
   persistent_disk_type: disks
   stemcell: default
   networks:
