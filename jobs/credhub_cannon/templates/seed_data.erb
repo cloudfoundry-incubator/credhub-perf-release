@@ -10,7 +10,7 @@ KEY_PATH=/var/vcap/jobs/credhub_cannon/config/mtls_auth_private_key.pem
 
 curl "${CREDHUB_URL}"/api/v1/data \
     -XPUT \
-    -H "Content-type: application-json" \
+    -H "Content-type: application/json" \
     --cacert "${CREDHUB_CA_PATH}" \
     --cert "${CERTIFICATE_PATH}" \
     --key "${KEY_PATH}" \
@@ -101,7 +101,7 @@ curl "${CREDHUB_URL}"/api/v1/data \
 
 curl "${CREDHUB_URL}"/api/v1/data \
     -XPUT \
-    -H "Content-type: application-json" \
+    -H "Content-type: application/json" \
     --cacert "${CREDHUB_CA_PATH}" \
     --cert "${CERTIFICATE_PATH}" \
     --key "${KEY_PATH}" \
@@ -134,7 +134,7 @@ curl "${CREDHUB_URL}"/api/v1/data \
 
 curl "${CREDHUB_URL}"/api/v1/data \
     -XPUT \
-    -H "Content-type: application-json" \
+    -H "Content-type: application/json" \
     --cacert "${CREDHUB_CA_PATH}" \
     --cert "${CERTIFICATE_PATH}" \
     --key "${KEY_PATH}" \
