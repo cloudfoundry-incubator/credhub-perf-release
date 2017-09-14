@@ -3,8 +3,10 @@ name: credhub_cannon
 
 templates:
   run.erb: bin/run
+  seed_data.erb: bin/seed_data
   mtls_auth_certificate.pem.erb: config/mtls_auth_certificate.pem
   mtls_auth_private_key.pem.erb: config/mtls_auth_private_key.pem
+  credhub_ca.pem.erb: config/credhub_ca.pem
 
 packages:
 - golang_1.8.3
@@ -15,6 +17,12 @@ properties:
   credhub.server.url:
     description: Endpoint of the CredHub server
     example: https://credhub.example.com:8844
+  credhub.server.ca:
+    description: CA certificate of the CredHub server
+    example: |
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
   cannon.credhub_auth.mtls:
     description: X509 certificate and private key for CredHub authentication
     type: certificate

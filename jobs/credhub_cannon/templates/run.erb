@@ -16,6 +16,8 @@ export PATH="/var/vcap/packages/hey/bin:${PATH}"
 
 mkdir -p "${LOG_DIR}"
 
+/var/vcap/jobs/credhub_cannon/bin/seed_data
+
 /var/vcap/packages/credhub_cannon/bin/credhub_cannon \
     --numRequests $NUM_REQUESTS \
     --minConcurrent $MIN_CONCURRENT \

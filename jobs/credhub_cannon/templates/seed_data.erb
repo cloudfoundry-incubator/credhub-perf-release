@@ -1,0 +1,168 @@
+#!/bin/bash
+
+set -eu
+<% if p('cannon.request_type') == 'get' || p('cannon.request_type') == 'interpolate' %>
+
+CREDHUB_URL="<%= p('credhub.server.url') %>"
+CREDHUB_CA_PATH=/var/vcap/jobs/credhub_cannon/config/credhub_ca.pem
+CERTIFICATE_PATH=/var/vcap/jobs/credhub_cannon/config/mtls_auth_certificate.pem
+KEY_PATH=/var/vcap/jobs/credhub_cannon/config/mtls_auth_private_key.pem
+
+curl "${CREDHUB_URL}"/api/v1/data \
+    -XPUT \
+    -H "Content-type: application-json" \
+    --cacert "${CREDHUB_CA_PATH}" \
+    --cert "${CERTIFICATE_PATH}" \
+    --key "${KEY_PATH}" \
+    -d '{"name": "/c/p-spring-cloud-services/circuit-breaker/5c9073f9-677b-4eb7-8c95-4b89d66d2890/credential-json", "type": "json", "value": {
+"dashboard": "https://hystrix-cd57788-2989-414c-8d96-ebe456a0905b.diego.example.com.com",
+"amqp": {
+"uris": [
+"amqp://first-test-value@10.0.3.44/53d2200b-10b3-4e8e-97f6-f3b5c6318e86"
+],
+"uri": "amqp://first-test-value@10.0.3.44/53d2200b-10b3-4e8e-97f6-f3b5c6318e86",
+"http_api_uri": "https://first-test-value@rabbitmq-management.diego.example.com.com/api/",
+"vhost": "53d2200b-5689-4e8e-97f6-f3b5c6318e86",
+"http_api_uris": [
+"https://first-test-value@rabbitmq-management.diego.example.com.com/api/"
+],
+"ssl": false,
+"dashboard_url": "https://rabbitmq-management.diego.example.com.com/#/login/f962c55f-bc96-4765-1234-0683ab67e9a2/p9fivu9u09v58r8db6r2087pt",
+"password": "p9fivu9u99778r8db6r2087pt",
+"protocols": {
+"stomp": {
+ "uris": [
+   "stomp://f962c55f-bc96-4765-b123-0683ab67e9a2:p9fivu9u09v58r8db6r2087pt@10.0.3.44:61613"
+ ],
+ "vhost": "53d2200b-10b3-4e8e-97f6-f3b5c6318e86",
+ "username": "f962c55f-bc96-4765-b642-0683ab67e9a2",
+ "password": "p9fivu9u09v58r8db6r2087pt",
+ "port": 61613,
+ "host": "10.0.3.44",
+ "hosts": [
+   "10.0.3.44"
+ ],
+ "ssl": false,
+ "uri": "stomp://f962c55f-bc96-4765-b642-0683ab67e9a2:p9fivu9u09v58r8db6r2087pt@10.0.3.44:61613"
+},
+"mqtt": {
+ "uris": [
+   "mqtt://53d2200b-10b3-4e8e-97f6-f3b5c6318e86%3Af962c55f-bc96-4765-b642-0683ab67e9a2:p9fivu9u09v58r8db6r2087pt@10.0.3.44:1883"
+ ],
+ "uri": "mqtt://53d2200b-10b3-4e8e-97f6-f3b5c6318e86%3Af962c55f-bc96-4765-b642-0683ab67e9a2:p9fivu9u09v58r8db6r2087pt@10.0.3.44:1883",
+ "ssl": false,
+ "hosts": [
+   "10.0.3.44"
+ ],
+ "host": "10.0.3.44",
+ "port": 1883,
+ "password": "p9fivu9u09v58r8db6r2187pt",
+ "username": "53d2200b-10b3-4e8e-97f6-f3b5c6318e86:f962c55f-bc96-4765-b642-0683ab67e9a2"
+},
+"management": {
+ "uris": [
+   "http://f962c55f-bc96-4763-b642-0683ab67e9a2:p9fivu9u09v58r8db6r2087pt@10.0.3.44:15672/api/"
+ ],
+ "path": "/api/",
+ "ssl": false,
+ "hosts": [
+   "10.0.3.44"
+ ],
+ "password": "p9fivu9u09v58r8db6r2087pt",
+ "username": "f962c55f-bc96-4765-b642-0683ab67e9a2",
+ "port": 15672,
+ "host": "10.0.3.44",
+ "uri": "http://first-test-value@10.0.3.44:15672/api/"
+},
+"amqp": {
+ "uris": [
+   "amqp://f962c55f-bc96-4765-b642-0683ab67e9a2:p9fivu9u09v58r8db6r2087pt@10.0.3.44:5672/53d2200b-10b3-4e8e-97f6-f3b5c6318e86"
+ ],
+ "vhost": "53d2200b-16b3-4e8e-97f6-f3b5c6318e86",
+ "username": "f962c55f-bc55-4765-b632-0683ab67e9a2",
+ "password": "p9fabc9u09v58m8db6r2087pt",
+ "port": 5672,
+ "host": "10.0.3.44",
+ "hosts": [
+   "10.0.3.44"
+ ],
+ "ssl": false,
+ "uri": "amqp://first-test-value@10.0.3.44:5672/53d2200b-10b3-4e8e-97f6-f3b5c6318e86"
+}
+},
+"username": "f962c55f-bc96-4765-b123-0683ab67e9a2",
+"hostname": "10.0.3.44",
+"hostnames": [
+"10.0.3.44"
+]
+},
+"stream": "https://first-test-value.diego.example.com.com"
+}'
+
+curl "${CREDHUB_URL}"/api/v1/data \
+    -XPUT \
+    -H "Content-type: application-json" \
+    --cacert "${CREDHUB_CA_PATH}" \
+    --cert "${CERTIFICATE_PATH}" \
+    --key "${KEY_PATH}" \
+    -d '{"name": "/c/p-spring-cloud-services/service-registry/5c9073f9-677b-4eb7-8c95-4b89d66d2891/credential-json", "type": "json", "value": {
+"dashboard": "https://second-test-value.diego.example.com.com",
+"amqp": {
+  "uris": [
+    "amqp://second-test-value@10.0.3.44/53d2200b-10b3-4e8e-97f6-f3b5c6318e86"
+  ],
+  "uri": "amqp://second-test-value@10.0.3.44/53d2200b-10b3-4e8e-97f6-f3b5c6318e86",
+  "http_api_uri": "https://second-test-value@rabbitmq-management.diego.example.com.com/api/",
+  "vhost": "53d29900-10b3-4e8e-97f6-f3b5c6318e86",
+  "http_api_uris": [
+    "https://second-test-value@rabbitmq-management.diego.example.com.com/api/"
+  ],
+  "ssl": false,
+  "dashboard_url": "https://rabbitmq-management.diego.example.com.com/#/login/f962c55f-bc96-4765-b642-0683ab67e9a2/p9fivu9u09v58r8db6r2087pt",
+  "password": "p9fjkjk9u8976r8db6r2087pt",
+  "protocols": {
+
+  },
+  "username": "second-test-value",
+  "hostname": "10.0.3.44",
+  "hostnames": [
+    "10.0.3.44"
+  ]
+},
+"stream": "https://turbine-second-test-value.diego.example.com.com"
+}'
+
+curl "${CREDHUB_URL}"/api/v1/data \
+    -XPUT \
+    -H "Content-type: application-json" \
+    --cacert "${CREDHUB_CA_PATH}" \
+    --cert "${CERTIFICATE_PATH}" \
+    --key "${KEY_PATH}" \
+    -d '{"name": "/c/p-spring-cloud-services/config-server/5c9073f9-677b-4eb7-8c95-4b89d66d2892/credential-json", "type": "json", "value": {
+"dashboard": "https://third-test-value.diego.example.com.com",
+"amqp": {
+"uris": [
+ "amqp://third-test-value@10.0.3.44/53d2200b-10b3-4e8e-97f6-f3b5c6318e86"
+],
+"uri": "amqp://third-test-value@10.0.3.44/53d2200b-10b3-4e8e-97f6-f3b5c6318e86",
+"http_api_uri": "https://third-test-value@rabbitmq-management.diego.example.com.com/api/",
+"vhost": "53d23344-10b3-4e8e-97f6-f3b5c6318e86",
+"http_api_uris": [
+ "https://third-test-value@rabbitmq-management.diego.example.com.com/api/"
+],
+"ssl": false,
+"dashboard_url": "https://rabbitmq-management.diego.example.com.com/#/login/f962c55f-bc96-4765-b642-0683ab67e9a2/p9fivu9u09v58r8db6r2087pt",
+"password": "p9fjkjk9u8976r8db6r2087pt",
+"protocols": {
+
+},
+"username": "third-test-value",
+"hostname": "10.0.3.44",
+"hostnames": [
+ "10.0.3.44"
+]
+},
+"stream": "https://turbine-third-test-value.diego.example.com.com"
+}'
+
+<% end %>

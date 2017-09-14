@@ -212,6 +212,7 @@ instance_groups:
       credhub:
         server:
           url: https://((credhub_host)):8844
+          ca: ((credhub-ca.certificate))
       cannon:
         credhub_auth:
           mtls: ((mtls/auth))
