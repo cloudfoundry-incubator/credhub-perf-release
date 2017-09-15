@@ -30,6 +30,6 @@ mkdir -p "${LOG_DIR}"
     >> "${LOG_DIR}/credhub_cannon.log" \
     2>> "${LOG_DIR}/credhub_cannon.stderr.log"
 
-<% if p('cannon.enable_cleanup') %>
+<% if p('cannon.enable_db_cleanup') %>
 /var/vcap/jobs/credhub_cannon/bin/truncate_tables
 <% end %>
