@@ -14,8 +14,7 @@ psql -c "TRUNCATE credential_name CASCADE";
 psql -c "TRUNCATE request_audit_record CASCADE";
 psql -c "TRUNCATE event_audit_record CASCADE";
 
-<% end
-elsif  p('credhub.db.type') == 'mysql' %>
+<% elsif  p('credhub.db.type') == 'mysql' %>
 apt-get install -y mysql-client
 
 mysql -u p('credhub.db.user') \
