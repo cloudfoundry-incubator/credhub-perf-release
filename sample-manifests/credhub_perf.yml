@@ -213,7 +213,14 @@ instance_groups:
         server:
           url: https://((credhub_host)):8844
           ca: ((credhub-ca.certificate))
+        db:
+          type: ((db_type))
+          host: ((db_host))
+          user: ((db_username))
+          password: ((db_password))
+          database_name: ((db_database_name))
       cannon:
+        enable_db_cleanup: ((enable_db_cleanup))
         credhub_auth:
           mtls: ((mtls/auth))
         request_type: ((requests_type))

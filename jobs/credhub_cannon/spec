@@ -4,6 +4,7 @@ name: credhub_cannon
 templates:
   run.erb: bin/run
   seed_data.erb: bin/seed_data
+  truncate_tables.erb: bin/truncate_tables
   mtls_auth_certificate.pem.erb: config/mtls_auth_certificate.pem
   mtls_auth_private_key.pem.erb: config/mtls_auth_private_key.pem
   credhub_ca.pem.erb: config/credhub_ca.pem
@@ -23,6 +24,20 @@ properties:
       -----BEGIN CERTIFICATE-----
       ...
       -----END CERTIFICATE-----
+  credhub.db.type:
+    description: Type of database used by the CredHub server (postgres or mysql)
+  credhub.db.host:
+    description: Database address used by the CredHub server
+  credhub.db.user:
+    descrition: Username for the CredHub database
+  credhub.db.password:
+    descrition: Password for the CredHub database
+  credhub.db.database_name:
+    descrition: Database name used by be the CredHub server
+
+  cannon.enable_db_cleanup:
+    description: Whether to delete all data in the database after each run of credhub_cannon
+    default: false
   cannon.credhub_auth.mtls:
     description: X509 certificate and private key for CredHub authentication
     type: certificate

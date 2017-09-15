@@ -1,0 +1,27 @@
+#!/bin/bash
+
+<% if p('cannon.enable_cleanup') %>
+apt-get install -y postgresql-client
+
+set -eu
+<% if p('credhub.db.type') == 'postgres' %>
+export PGHOST = p('credhub.db.host')
+export PGUSER = p('credhub.db.user')
+export PGPASSWORD = p('credhub.db.password')
+export PGDATABASE = p('credhub.db.database_name')
+
+psql -c "TRUNCATE credential_name CASCADE";
+psql -c "TRUNCATE request_audit_record CASCADE";
+psql -c "TRUNCATE event_audit_record CASCADE";
+
+<% end
+elsif  p('credhub.db.type') == 'mysql' %>
+apt-get install -y mysql-client
+
+mysql -u p('credhub.db.user') \
+      -h p('credhub.db.host') \
+      -P p('credhub.db.password') \
+      p('credhub.db.database_name') \
+      -e 'TRUNCATE credential_name CASCADE; TRUNCATE request_audit_record CASCADE"; TRUNCATE event_audit_record CASCADE';
+<% end %>
+<% end %>

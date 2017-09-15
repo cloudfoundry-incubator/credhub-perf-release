@@ -29,3 +29,7 @@ mkdir -p "${LOG_DIR}"
     --x509Key "${KEY_PATH}" \
     >> "${LOG_DIR}/credhub_cannon.log" \
     2>> "${LOG_DIR}/credhub_cannon.stderr.log"
+
+<% if p('cannon.enable_cleanup') %>
+/var/vcap/jobs/credhub_cannon/bin/truncate_tables
+<% end %>

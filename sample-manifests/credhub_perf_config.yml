@@ -19,3 +19,6 @@ maximum_concurrency:
 concurrency_step_size:
 requests_per_step:
 
+# Enable/disable database cleanup
+enable_db_cleanup:
+
