@@ -21,6 +21,6 @@ mysql -u <%= p('credhub.db.user') %> \
       -h <%= p('credhub.db.host') %> \
       -P <%= p('credhub.db.password') %> \
       <%= p('credhub.db.database_name') %> \
-      -e 'TRUNCATE credential_name CASCADE; TRUNCATE request_audit_record CASCADE"; TRUNCATE event_audit_record CASCADE';
+      -e 'TRUNCATE credential_name CASCADE; TRUNCATE request_audit_record CASCADE; TRUNCATE event_audit_record CASCADE';
 <% end %>
 <% end %>
