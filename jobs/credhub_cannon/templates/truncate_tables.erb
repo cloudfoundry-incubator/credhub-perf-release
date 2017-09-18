@@ -1,10 +1,12 @@
 #!/bin/bash
 
 <% if p('cannon.enable_db_cleanup') %>
+
+<% if p('credhub.db.type') == 'postgres' %>
 apt-get install -y postgresql-client
 
 set -eu
-<% if p('credhub.db.type') == 'postgres' %>
+
 export PGHOST=<%= p('credhub.db.host') %>
 export PGUSER=<%= p('credhub.db.user') %>
 export PGPASSWORD=<%= p('credhub.db.password') %>
@@ -17,10 +19,13 @@ psql -c "TRUNCATE event_audit_record CASCADE";
 <% elsif  p('credhub.db.type') == 'mysql' %>
 apt-get install -y mysql-client
 
+set -eu
+
+export MYSQL_PWD="<%= p('credhub.db.password') %>"
+export MYSQL_HOST="<%= p('credhub.db.host') %>"
+
 mysql -u <%= p('credhub.db.user') %> \
-      -h <%= p('credhub.db.host') %> \
-      -P <%= p('credhub.db.password') %> \
       <%= p('credhub.db.database_name') %> \
-      -e 'TRUNCATE credential_name CASCADE; TRUNCATE request_audit_record CASCADE; TRUNCATE event_audit_record CASCADE';
+      -e 'DELETE FROM credential_name; DELETE FROM request_audit_record; DELETE FROM event_audit_record';
 <% end %>
 <% end %>
